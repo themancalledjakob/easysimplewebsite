@@ -14,7 +14,7 @@ function init() {
 	height = $(document).outerHeight();
 
 	console.log('congratulations! you are here, doing this!')
-	$('#contentainer').html("YYYYYYEAH");
+	$('#content').html("YYYYYYEAH");
 
 	$.each(projects, function(i, obj) {
   //use obj.id and obj.name here, for example:
@@ -30,8 +30,8 @@ function init() {
 function layout(){
 	width = $(document).outerWidth();
 	height = $(document).outerHeight();
-	$('#contentainer').width(width);
-	$('#contentainer').height(height);
+	$('#content').width(width);
+	$('#content').height(height);
 	centerHack();
 }
 
@@ -40,15 +40,13 @@ function showProject(p){
 		preloadIMAGES(projects[p]);
 
 	// });
-	
 	showImage(p,0);
 	centerHack();
 	flip();
-
 }
 
 function showImage(p,i){
-	$('#contentainer').html(getImageTag(p,i));
+	$('#content').html(getImageTag(p,i));
 }
 
 function getImageTag(p,i){
@@ -56,7 +54,7 @@ function getImageTag(p,i){
 }
 
 function flip(){
-	$("#contentainer").animate({ whyNotToUseANonExistingProperty: -90 }, {
+	$("#content").animate({ whyNotToUseANonExistingProperty: -90 }, {
 	    step: function(now,fx) {
 	        allBrowserFlip(this,now);
 	    },
@@ -96,8 +94,8 @@ function allBrowserFlip(thisThing,now){
 function centerHack(){
 	var aWidth = $("#active").attr('data-width');
 	var aHeight = $("#active").attr('data-height');
-	var pWidth = width; //$('#contentainer').outerWidth();
-	var pHeight = height; //$('#contentainer').outerHeight();
+	var pWidth = width; //$('#content').outerWidth();
+	var pHeight = height; //$('#content').outerHeight();
 	var aRatio = aWidth/aHeight;
 	var docRatio = pWidth/pHeight;
 
@@ -171,7 +169,7 @@ function flipItX(dir){
 	var dir = flipX > 0 ? 1 : -1; 
 	flipX = Math.abs(flipX)%360;
 	flipX *= dir;
-	allBrowserFlip($("#contentainer"),flipX);
+	allBrowserFlip($("#content"),flipX);
 
 	var isFlipped = Math.abs( Math.abs(flipX%180) - Math.abs(lastFlipX%180) ) > 90 || lastFlipX * flipX < 0 ? true : false;
 	if( isFlipped){
@@ -180,37 +178,31 @@ function flipItX(dir){
 		if(invert.indexOf('_i') >= 0)
 			invert = '';
 		else
-			invert = '_i';
+			invert = '_i';		
 	}
 
-	var isTurned = Math.abs( (Math.abs(flipX+90)%180) - (Math.abs(lastFlipX+90)%180) ) > 90 || Math.abs( (Math.abs(flipX+90+180)%180) - (Math.abs(lastFlipX+90+180)%180) ) > 90 ? true : false;
+	var isTurned = Math.abs( Math.abs((flipX+90)%180) - Math.abs((lastFlipX+90)%180) ) > 90 || (lastFlipX+90) * (flipX+90) < 0 ? true : false;
 	if(isTurned){
-		console.log('look away');
- 		// current[0]++;
+		// console.log('look away');
+		// current[0]++;
 		// current[0]%=2;
 		// showImage(current[0],current[1]);
 		// centerHack();
-		// if( $('#active').css('display') === 'block' ){
-		// 	$('#active').css('display','none');
-		// } else {
-		// 	$('#active').css('display','block');
-		// }
-		// flipTo(0,1000);
 	}
 
 	lastFlipX = flipX;
 }
 
-function flipTo(goal,_duration){
-	$("#contentainer").animate({ whyNotToUseANonExistingProperty: goal }, {
+function flipTo(goal,duration){
+	$("#content").animate({ whyNotToUseANonExistingProperty: goal }, {
 	    step: function(now,fx) {
 	        allBrowserFlip(this,now);
 	    },
-	    duration:_duration,
+	    duration:duration,
 	    complete: function(){
-	    	// bFlip = true;
+	    	bFlip = true;
 	    }
-	},'linear');
+	},'swing');
 }
 
 // TOOLS

@@ -28,7 +28,7 @@ foreach ($projects as $project) {
 echo "<script>loadProjects(" . json_encode($projectsdata) . ");</script>"
 ?>
 <!-- <div id="containter"> -->
-<div id="content">CONTENT</div>
+<div id="contentainer">CONTENT</div>
 <!-- </div> -->
 </body>
 </html>
