@@ -25,3 +25,9 @@ body {
 	left:0px;
  	perspective: 800px;
 }
+.projectImage {
+  	position: relative;
+ 	top:0px;
+	left:0px;
+	display: none;
+}

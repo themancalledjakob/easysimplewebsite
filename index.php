@@ -6,6 +6,7 @@
 <meta name="keywords" content="Jakob Schl&ouml;tter, Design, Utrecht, Den Haag, KABK, Jakob, Schloetter, Ontwerpen, Grafisch, Ontwerper, Megamieters" />
 <meta name="description" content="The man called Jakob is a prestige design studio in Den Haag. It is very good. If you need a convincing Design Studio, you should try it. They design books, websites, animations, corporate identities, trailers and especially everything else that sounds interesting." />
     <script src="js/jquery-2.1.3.js"></script>
+    <script src="js/jquery.easing.1.3.js"></script>
     <script src="js/main.js"></script>
     <link rel="stylesheet" type="text/css" href="styles/main.css">
 
@@ -29,6 +30,7 @@ echo "<script>loadProjects(" . json_encode($projectsdata) . ");</script>"
 ?>
 <!-- <div id="containter"> -->
 <div id="contentainer">CONTENT</div>
+<div id="animator"></div>
 <!-- </div> -->
 </body>
 </html>
