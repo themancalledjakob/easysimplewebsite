@@ -154,17 +154,20 @@ function setupScrolling(){
  $(window).bind('mousewheel', function(e){
  	if(bFlip){
  		$('body').stop();
-	    flipItX( e.originalEvent.wheelDelta * 0.012);
-    	$('body').animate({ whyNotToUseANonExistingProperty: 0 }, {
-		    step: function(now,fx) {
-		    },
-		    duration:70,
-		    complete: function(){
-		    	var goal = flipX < 90 ? 0 : flipX < 180 ? 180 : flipX < 270 ? 180 : 360;
-		    	var duration = Math.abs(flipX-goal)*6;
-		    	flipTo(goal,duration);
-		    }
-		},'swing');
+	 //    flipItX( e.originalEvent.wheelDelta * 0.07512);
+  //   	$('body').animate({ whyNotToUseANonExistingProperty: 0 }, {
+		//     step: function(now,fx) {
+		//     },
+		//     duration:270,
+		//     complete: function(){
+		//     	var goal = flipX < 90 ? 0 : flipX < 180 ? 180 : flipX < 270 ? 180 : 360;
+		//     	var duration = Math.abs(flipX-goal)*6;
+		//     	flipTo(goal,duration);
+		//     }
+		// },'swing');
+ 		var goal = e.originalEvent.wheelDelta > 0 ? 180 : -180;
+ 		flipX = 0;
+ 		flipTo(goal,1000); 
  	}
      return false;
  });
@@ -211,6 +214,13 @@ function flipTo(goal,_duration){
 	    duration: _duration,
 	    // easing: 'easeInOutBounce',
 	    step: function(now,fx) {
+	    	if ( Math.abs(flipX-now) >= 90 ){
+		 		current[ENUM_IMAGE]++;
+				current[ENUM_IMAGE]%=projects[current[ENUM_PROJECT]].images.length;
+				showImage(current[ENUM_PROJECT],current[ENUM_IMAGE]);
+				centerHack("#projectImage" + current[ENUM_IMAGE]);
+	    		flipX = now;
+	    	}
 	        allBrowserFlip($('#contentainer'),now);
 	    },
 	    complete: function(){
