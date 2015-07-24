@@ -67,38 +67,6 @@ function getImageTag(p,i){
 	return '<img id="projectImage' + i + '" class="projectImage" src="../projects/' + projects[p].folder + '/' + projects[p].images[i].src + '" data-width="' + projects[p].images[i].size[0] + '" data-height="' + projects[p].images[i].size[1] + '">';
 }
 
-// function flip(){
-	// $("#contentainer").animate({ whyNotToUseANonExistingProperty: -90 }, {
-	//     step: function(now,fx) {
-	//         allBrowserFlip(this,now);
-	//     },
-	//     duration:500,
-	//     complete: function(){
-	//     	current[1] += 1;
-	//     	showImage(current[0],current[1]);
-	//     	$(this).animate({ whyNotToUseANonExistingProperty: 90 }, {
-	// 		    step: function(now,fx) {
-	// 		        allBrowserFlip(this,now);
-	// 		    },
-	// 		    duration:0,
-	// 		    complete: function(){
-	// 		    	centerHack();
-	// 		    	$(this).animate({ whyNotToUseANonExistingProperty: 0 }, {
-	// 				    step: function(now,fx) {
-	// 				        allBrowserFlip(this,now);
-	// 				    },
-	// 				    duration:500,
-	// 				    complete: function(){
-	// 				    	bFlip = true;
-	// 				    	console.log("flipped to " + flipX)
-	// 				    }
-	// 				},'swing');
-	// 		    }
-	// 		},'linear');
-	//     }
-	// },'swing');
-// }
-
 function allBrowserFlip(thisThing,now){
       $(thisThing).css('-webkit-transform',"perspective( 600px ) rotateX( " + now + "deg )");
       $(thisThing).css('-moz-transform',"perspective( 600px ) rotateX( " + now + "deg )");
@@ -109,17 +77,17 @@ function allBrowserFlip(thisThing,now){
 function centerHack(id){
 	var aWidth = $(id).attr('data-width');
 	var aHeight = $(id).attr('data-height');
-	var pWidth = width; //$('#contentainer').outerWidth();
+	var pWidth = width-200; //$('#contentainer').outerWidth();
 	var pHeight = height; //$('#contentainer').outerHeight();
 	var aRatio = aWidth/aHeight;
 	var docRatio = pWidth/pHeight;
 
 	if(aRatio > docRatio){
 		// image is wider
-		$(id).width(width);
+		$(id).width(pWidth);
 		var newHeight = pWidth*aHeight/aWidth;
 		$(id).height(newHeight);
-		// var off = (pHeight - newHeight)/2;
+		var off = (pHeight - newHeight)/2;
 		$(id).css("top", off);
 		$(id).css("left", 0);
 	} else {
@@ -138,14 +106,14 @@ function setupScrolling(){
 	//  //Firefox
  $(window).bind('DOMMouseScroll', function(e){
  	console.log(e);
-     if(e.originalEvent.detail > 0) {
-         //scroll down
-         console.log('Down');
-     }else {
-         //scroll up
-         console.log('Up');
+     // //prevent page fom scrolling
+     if(bFlip){
+ 		$('body').stop();
+ 		var goal = e.originalEvent.detail > 0 ? 180 : -180;
+ 		flipX = 0;
+ 		flipTo(goal,1000); 
      }
-     //prevent page fom scrolling
+
      return false;
  });
 
@@ -154,17 +122,6 @@ function setupScrolling(){
  $(window).bind('mousewheel', function(e){
  	if(bFlip){
  		$('body').stop();
-	 //    flipItX( e.originalEvent.wheelDelta * 0.07512);
-  //   	$('body').animate({ whyNotToUseANonExistingProperty: 0 }, {
-		//     step: function(now,fx) {
-		//     },
-		//     duration:270,
-		//     complete: function(){
-		//     	var goal = flipX < 90 ? 0 : flipX < 180 ? 180 : flipX < 270 ? 180 : 360;
-		//     	var duration = Math.abs(flipX-goal)*6;
-		//     	flipTo(goal,duration);
-		//     }
-		// },'swing');
  		var goal = e.originalEvent.wheelDelta > 0 ? 180 : -180;
  		flipX = 0;
  		flipTo(goal,1000); 
@@ -173,58 +130,27 @@ function setupScrolling(){
  });
 }
 
-var stopped = false;
-var invert = '';
-function flipItX(dir){
-	flipX += dir;
-	var dir = flipX > 0 ? 1 : -1; 
-	flipX = Math.abs(360+flipX)%360;
-	// flipX *= dir;
-	allBrowserFlip($("#contentainer"),flipX);
-
-	var isFlippedX = Math.abs( Math.abs(flipX%180) - Math.abs(lastFlipX%180) ) > 90 || lastFlipX * flipX < 0 ? true : false;
-	if( isFlippedX){
-		// $('body').css('background-image', 'url(img/okay' + invert + '.png)');
-		// $('body').css('background-color', 'rgba(' + Math.floor(Math.random()*105+150) + ',' + Math.floor(Math.random()*105+150) + ',' + Math.floor(Math.random()*105+150) + ',1)');
-		if(invert.indexOf('_i') >= 0)
-			invert = '';
-		else
-			invert = '_i';
-	}
-
-	var isTurnedX = Math.abs( (Math.abs(flipX+90)%180) - (Math.abs(lastFlipX+90)%180) ) > 90 || Math.abs( (Math.abs(flipX+90+180)%180) - (Math.abs(lastFlipX+90+180)%180) ) > 90 ? true : false;
-	if(isTurnedX){
-		console.log('look away');
- 		current[ENUM_IMAGE]++;
-		current[ENUM_IMAGE]%=projects[current[ENUM_PROJECT]].images.length;
-		showImage(current[ENUM_PROJECT],current[ENUM_IMAGE]);
-		centerHack("#projectImage" + current[ENUM_IMAGE]);
-		flipX += 180;
-		flipX %= 360;
-		allBrowserFlip($("#contentainer"),flipX);
-	}
-
-	lastFlipX = flipX;
-}
-
 function flipTo(goal,_duration){
-	console.log("flipX" + flipX);
+	console.log("flipX " + goal);
 	bFlip = false;
+	var plus = 0;
+	var nextImageLoaded = false;
 	$("#animator").css('font-size', flipX).animate({ fontSize: goal }, {
 	    duration: _duration,
 	    // easing: 'easeInOutBounce',
 	    step: function(now,fx) {
-	    	if ( Math.abs(flipX-now) >= 90 ){
+	    	if ( Math.abs(now) >= Math.abs(goal)*0.5 && !nextImageLoaded ){
 		 		current[ENUM_IMAGE]++;
 				current[ENUM_IMAGE]%=projects[current[ENUM_PROJECT]].images.length;
 				showImage(current[ENUM_PROJECT],current[ENUM_IMAGE]);
 				centerHack("#projectImage" + current[ENUM_IMAGE]);
-	    		flipX = now;
+	    		nextImageLoaded = true;
+	    		plus = 180;
 	    	}
-	        allBrowserFlip($('#contentainer'),now);
+	        allBrowserFlip($('#contentainer'),now+plus);
 	    },
 	    complete: function(){
-	    	flipX = goal;
+	    	flipX = goal +plus;
 			$("#animator").css('font-size', 0.0).animate({ fontSize: 1.0 }, {
 			    duration: 200,
 			   	complete: function(){
