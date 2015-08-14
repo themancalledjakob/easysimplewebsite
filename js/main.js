@@ -10,8 +10,10 @@ var ENUM_IMAGE = 1;
 
 
 var lastFlipX = 0;
-var flipX = 0;
+var currentFlip = [0,0];
 var bFlip = true;
+var ENUM_FLIP_X = 0;
+var ENUM_FLIP_Y = 1;
 
 
 $(function(){
@@ -35,6 +37,7 @@ function init() {
 
 	layout();
 	setupScrolling();
+	setupButtons();
 };
 
 function layout(){
@@ -43,6 +46,10 @@ function layout(){
 	$('#contentainer').width(width-200);
 	$('#contentainer').height(height);
 	centerHack();
+	$('#btn_right').css('top',height/2);
+	$('#btn_right').css('right',20 + 200);
+	$('#btn_left').css('top',height/2);
+	$('#btn_left').css('left',20);
 }
 
 function showProject(p){
@@ -67,11 +74,12 @@ function getImageTag(p,i){
 	return '<img id="projectImage' + i + '" class="projectImage" src="../projects/' + projects[p].folder + '/' + projects[p].images[i].src + '" data-width="' + projects[p].images[i].size[0] + '" data-height="' + projects[p].images[i].size[1] + '">';
 }
 
-function allBrowserFlip(thisThing,now){
-      $(thisThing).css('-webkit-transform',"perspective( 600px ) rotateX( " + now + "deg )");
-      $(thisThing).css('-moz-transform',"perspective( 600px ) rotateX( " + now + "deg )");
-      $(thisThing).css('-o-transform',"perspective( 600px ) rotateX( " + now + "deg )");
-      $(thisThing).css('transform',"perspective( 600px ) rotateX( " + now + "deg )");
+function allBrowserFlip(thisThing,now,axis){
+	var xy = axis == ENUM_FLIP_X ? 'X' : 'Y'; 
+   	$(thisThing).css('-webkit-transform',"perspective( 600px ) rotate" + xy + "( " + now + "deg )");
+    $(thisThing).css('-moz-transform',"perspective( 600px ) rotate" + xy + "( " + now + "deg )");
+    $(thisThing).css('-o-transform',"perspective( 600px ) rotate" + xy + "( " + now + "deg )");
+    $(thisThing).css('transform',"perspective( 600px ) rotate" + xy + "( " + now + "deg )");
 }
 
 function centerHack(id){
@@ -110,8 +118,8 @@ function setupScrolling(){
      if(bFlip){
  		$('body').stop();
  		var goal = e.originalEvent.detail > 0 ? 180 : -180;
- 		flipX = 0;
- 		flipTo(goal,1000); 
+ 		currentFlip[ENUM_FLIP_X] = 0;
+ 		flipTo(goal,1000,ENUM_FLIP_X); 
      }
 
      return false;
@@ -123,31 +131,48 @@ function setupScrolling(){
  	if(bFlip){
  		$('body').stop();
  		var goal = e.originalEvent.wheelDelta > 0 ? 180 : -180;
- 		flipX = 0;
- 		flipTo(goal,1000); 
+ 		currentFlip[ENUM_FLIP_X] = 0;
+ 		flipTo(goal,1000,ENUM_FLIP_X); 
  	}
      return false;
  });
 }
 
-function flipTo(goal,_duration){
+function setupButtons(){
+	$('#btn_right').click(function(){
+ 		flipTo(180,1000,ENUM_FLIP_Y); 
+	});
+	$('#btn_left').click(function(){
+ 		flipTo(-180,1000,ENUM_FLIP_Y); 
+	});
+}
+
+function flipTo(goal,_duration,axis){
 	console.log("flipX " + goal);
 	bFlip = false;
 	var plus = 0;
 	var nextImageLoaded = false;
-	$("#animator").css('font-size', flipX).animate({ fontSize: goal }, {
+	$("#animator").css('font-size', currentFlip[axis]).animate({ fontSize: goal }, {
 	    duration: _duration,
 	    // easing: 'easeInOutBounce',
 	    step: function(now,fx) {
 	    	if ( Math.abs(now) >= Math.abs(goal)*0.5 && !nextImageLoaded ){
-		 		current[ENUM_IMAGE]++;
-				current[ENUM_IMAGE]%=projects[current[ENUM_PROJECT]].images.length;
+	    		if(axis == ENUM_FLIP_X){
+		 			current[ENUM_IMAGE]++;
+					current[ENUM_IMAGE]%=projects[current[ENUM_PROJECT]].images.length;
+	    		} else {
+	    			current[ENUM_PROJECT] = goal > 0 ? current[ENUM_PROJECT]+1 : projects.length + current[ENUM_PROJECT]-1;
+					current[ENUM_PROJECT]%=projects.length;
+		 			current[ENUM_IMAGE] = 0;
+		 			showProject(current[ENUM_PROJECT]);
+		 			console.log("new PORJECT" +  current[ENUM_PROJECT]);
+	    		}
 				showImage(current[ENUM_PROJECT],current[ENUM_IMAGE]);
 				centerHack("#projectImage" + current[ENUM_IMAGE]);
 	    		nextImageLoaded = true;
 	    		plus = 180;
 	    	}
-	        allBrowserFlip($('#contentainer'),now+plus);
+	        allBrowserFlip($('#contentainer'),now+plus,axis);
 	    },
 	    complete: function(){
 	    	flipX = goal +plus;

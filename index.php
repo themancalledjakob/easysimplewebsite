@@ -31,6 +31,8 @@ echo "<script>loadProjects(" . json_encode($projectsdata) . ");</script>"
 <!-- <div id="containter"> -->
 <div id="contentainer">CONTENT</div>
 <div id="animator"></div>
+<div id="btn_right" class="button">RIGHT</div>
+<div id="btn_left" class="button">LEFT</div>
 <!-- </div> -->
 </body>
 </html>
